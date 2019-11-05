@@ -471,5 +471,6 @@ export default {
   'Startup parameter': 'Startup parameter',
   'Startup type': 'Startup type',
   'warning of timeout': 'warning of timeout',
-  'Complement range': 'Complement range'
+  'Complement range': 'Complement range',
+  'Crontab Exp Second/Minutes is eq *': 'Crontab Exp Second/Minutes is eq *'
 }

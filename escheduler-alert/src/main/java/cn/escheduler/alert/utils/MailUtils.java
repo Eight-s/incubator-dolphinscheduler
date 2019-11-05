@@ -33,12 +33,9 @@ import org.springframework.util.ResourceUtils;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
-import java.security.Security;
 import java.util.*;
 
-import static cn.escheduler.alert.utils.PropertyUtils.getBoolean;
-import static cn.escheduler.alert.utils.PropertyUtils.getInt;
-import static cn.escheduler.alert.utils.PropertyUtils.getString;
+import static cn.escheduler.alert.utils.PropertyUtils.*;
 
 
 /**
@@ -53,6 +50,8 @@ public class MailUtils {
     public static final String mailServerHost = getString(Constants.MAIL_SERVER_HOST);
 
     public static final Integer mailServerPort = getInt(Constants.MAIL_SERVER_PORT);
+
+    public static final String mailUser = getString(Constants.MAIL_USER);
 
     public static final String mailSender = getString(Constants.MAIL_SENDER);
 
@@ -296,7 +295,7 @@ public class MailUtils {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 // mail username and password
-                return new PasswordAuthentication(mailSender, mailPasswd);
+                return new PasswordAuthentication(mailUser, mailPasswd);
             }
         };
         // 1. The first step in creating mail: creating session
@@ -376,7 +375,7 @@ public class MailUtils {
          * if you need authentication information, set authentication: username-password.
          * The registered name and password of the sender on the mail server respectively
          */
-        email.setAuthentication(mailSender, mailPasswd);
+        email.setAuthentication(mailUser, mailPasswd);
 
         /**
          * the subject of the message to be sent

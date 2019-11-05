@@ -46,8 +46,8 @@ public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
     public void testSendMails() {
-        String[] receivers = new String[]{"xx@xx.com"};
-        String[] receiversCc = new String[]{"xxx@xxx.com"};
+        String[] receivers = new String[]{"201804638@any3.com"};
+        String[] receiversCc = new String[]{"201804638@any3.com"};
 
         String content ="[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +

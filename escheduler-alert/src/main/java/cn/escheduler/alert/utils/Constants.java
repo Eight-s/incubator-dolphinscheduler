@@ -45,6 +45,8 @@ public class Constants {
 
     public static final String MAIL_SERVER_PORT = "mail.server.port";
 
+    public static final String MAIL_USER = "mail.user";
+
     public static final String MAIL_SENDER = "mail.sender";
 
     public static final String MAIL_PASSWD = "mail.passwd";

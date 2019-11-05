@@ -9,19 +9,20 @@
       </div>
       <div class="cont">
         <x-datepicker
-                style="width: 360px;"
-                :panel-num="2"
-                placement="bottom-start"
-                @on-change="_datepicker"
-                :value="scheduleTime"
-                type="daterange"
-                :placeholder="$t('Select date range')"
-                format="YYYY-MM-DD HH:mm:ss">
+          style="width: 360px;"
+          :panel-num="2"
+          placement="bottom-start"
+          @on-change="_datepicker"
+          :value="scheduleTime"
+          type="daterange"
+          :placeholder="$t('Select date range')"
+          format="YYYY-MM-DD HH:mm:ss">
         </x-datepicker>
       </div>
     </div>
     <div class="clearfix list">
-      <x-button type="info"  style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()">执行时间</x-button>
+      <x-button type="info" style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()">执行时间
+      </x-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
@@ -34,11 +35,11 @@
             </div>
             <template slot="reference">
               <x-input
-                      style="width: 360px;"
-                      type="text"
-                      readonly
-                      :value="crontab"
-                      autocomplete="off">
+                style="width: 360px;"
+                type="text"
+                readonly
+                :value="crontab"
+                autocomplete="off">
               </x-input>
             </template>
           </x-poptip>
@@ -46,9 +47,9 @@
       </div>
     </div>
     <div class="clearfix list">
-      <div style = "padding-left: 150px;">未来五次执行时间</div>
-      <ul style = "padding-left: 150px;">
-          <li v-for="time in previewTimes">{{time}}</li>
+      <div style="padding-left: 150px;">未来五次执行时间</div>
+      <ul style="padding-left: 150px;">
+        <li v-for="time in previewTimes">{{time}}</li>
       </ul>
     </div>
 
@@ -69,13 +70,13 @@
       </div>
       <div class="cont">
         <x-select
-                style="width: 200px;"
-                v-model="warningType">
+          style="width: 200px;"
+          v-model="warningType">
           <x-option
-                  v-for="city in warningTypeList"
-                  :key="city.id"
-                  :value="city.id"
-                  :label="city.code">
+            v-for="city in warningTypeList"
+            :key="city.id"
+            :value="city.id"
+            :label="city.code">
           </x-option>
         </x-select>
       </div>
@@ -102,18 +103,22 @@
       </div>
       <div class="cont">
         <x-select
-                style="width: 200px;"
-                :disabled="!notifyGroupList.length"
-                v-model="warningGroupId">
-          <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
+          style="width: 200px;"
+          :disabled="!notifyGroupList.length"
+          v-model="warningGroupId">
+          <x-input slot="trigger" readonly slot-scope="{ selectedModel }"
+                   :placeholder="$t('Please select a notification group')"
+                   :value="selectedModel ? selectedModel.label : ''" style="width: 200px;"
+                   @on-click-icon.stop="warningGroupId = {}">
+            <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;"
+               v-show="warningGroupId.id"></i>
             <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
           </x-input>
           <x-option
-                  v-for="city in notifyGroupList"
-                  :key="city.id"
-                  :value="city"
-                  :label="city.code">
+            v-for="city in notifyGroupList"
+            :key="city.id"
+            :value="city"
+            :label="city.code">
           </x-option>
         </x-select>
       </div>
@@ -135,8 +140,10 @@
       </div>
     </div>
     <div class="submit">
-      <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
+      <x-button type="text" @click="close()"> {{$t('Cancel')}}</x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' :
+        (item.crontab ? $t('Edit') : $t('Create'))}}
+      </x-button>
     </div>
   </div>
 </template>
@@ -146,15 +153,15 @@
   import mEmail from './email.vue'
   import '~/@vue/crontab/dist/index.css'
   import store from '@/conf/home/store'
-  import { warningTypeList } from './util'
-  import { vCrontab } from '~/@vue/crontab/dist'
-  import { formatDate } from '@/module/filter/filter'
+  import {warningTypeList} from './util'
+  import {vCrontab} from '~/@vue/crontab/dist'
+  import {formatDate} from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
   export default {
     name: 'timing-process',
-    data () {
+    data() {
       return {
         store,
         processDefinitionId: 0,
@@ -165,7 +172,7 @@
         warningGroupId: {},
         spinnerLoading: false,
         scheduleTime: '',
-        crontab: '* * * * * ? *',
+        crontab: '0 0 * * * ? *',
         cronPopover: false,
         receivers: [],
         receiversCc: [],
@@ -181,10 +188,10 @@
       receiversCcD: Array
     },
     methods: {
-      _datepicker (val) {
+      _datepicker(val) {
         this.scheduleTime = val
       },
-      _verification () {
+      _verification() {
         if (!this.scheduleTime) {
           this.$message.warning(`${i18n.$t('Please select time')}`)
           return false
@@ -199,9 +206,20 @@
           this.$message.warning(`${i18n.$t('Please enter crontab')}`)
           return false
         }
+
+        // crontab exp warning
+        let crontabExp = this.crontab.split(" ")
+        let second = crontabExp[0]
+        let minutes = crontabExp[1]
+
+        if (second === "*" || minutes === "*") {
+          this.$message.warning(`${i18n.$t('Crontab Exp Second/Minutes is eq *')}`)
+          return false
+        }
+
         return true
       },
-      _timing () {
+      _timing() {
         if (this._verification()) {
           let api = ''
           let searchParams = {
@@ -240,25 +258,25 @@
         }
       },
 
-      _preview () {
-              if (this._verification()) {
-                let api = 'dag/previewSchedule'
-                let searchParams = {
-                  schedule: JSON.stringify({
-                    startTime: this.scheduleTime[0],
-                    endTime: this.scheduleTime[1],
-                    crontab: this.crontab
-                  })
-                }
-                let msg = ''
+      _preview() {
+        if (this._verification()) {
+          let api = 'dag/previewSchedule'
+          let searchParams = {
+            schedule: JSON.stringify({
+              startTime: this.scheduleTime[0],
+              endTime: this.scheduleTime[1],
+              crontab: this.crontab
+            })
+          }
+          let msg = ''
 
-                this.store.dispatch(api, searchParams).then(res => {
-                  this.previewTimes = res
-                })
-              }
-            },
+          this.store.dispatch(api, searchParams).then(res => {
+            this.previewTimes = res
+          })
+        }
+      },
 
-      _getNotifyGroupList () {
+      _getNotifyGroupList() {
         return new Promise((resolve, reject) => {
           let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
           if (!notifyGroupListS.length) {
@@ -276,23 +294,22 @@
           }
         })
       },
-      ok () {
+      ok() {
         this._timing()
       },
-      close () {
+      close() {
         this.$emit('close')
       },
-      preview () {
+      preview() {
         this._preview()
       }
     },
-    watch: {
-    },
-    created () {
+    watch: {},
+    created() {
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
     },
-    mounted () {
+    mounted() {
       let item = this.item
 
       // Determine whether to echo
@@ -306,18 +323,18 @@
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
-            this.warningGroupId = list.length && list[0] || { id: 0 }
+            this.warningGroupId = list.length && list[0] || {id: 0}
           })
-        }).catch(() => this.warningGroupId = { id: 0 })
+        }).catch(() => this.warningGroupId = {id: 0})
       } else {
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
-            this.warningGroupId = { id: 0 }
+            this.warningGroupId = {id: 0}
           })
-        }).catch(() => this.warningGroupId = { id: 0 })
+        }).catch(() => this.warningGroupId = {id: 0})
       }
     },
-    components: { vCrontab, mEmail, mPriority, mWorkerGroups }
+    components: {vCrontab, mEmail, mPriority, mWorkerGroups}
   }
 </script>
 
@@ -347,7 +364,7 @@
     }
     .list {
       margin-bottom: 14px;
-      >.text {
+      > .text {
         width: 140px;
         float: left;
         text-align: right;
@@ -366,6 +383,7 @@
       padding-bottom: 30px;
     }
   }
+
   .v-crontab-from-model {
     .list-box {
       padding: 0;

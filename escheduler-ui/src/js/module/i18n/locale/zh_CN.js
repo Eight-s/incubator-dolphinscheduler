@@ -472,5 +472,6 @@ export default {
   'Startup parameter': '启动参数',
   'Startup type': '启动类型',
   'warning of timeout': '超时告警',
-  'Complement range': '补数范围'
+  'Complement range': '补数范围',
+  'Crontab Exp Second/Minutes is eq *': 'Crontab定时表达式，按秒/分钟提交任务'
 }
