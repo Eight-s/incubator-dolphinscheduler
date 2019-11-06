@@ -457,7 +457,7 @@ router.beforeEach((to, from, next) => {
   let $body = $('body')
   $body.find('.tooltip.fade.top.in').remove()
   if (to.meta.title) {
-    document.title = `${to.meta.title} - 智云调度中心`
+    document.title = `${to.meta.title} - 智数调度中心`
   }
   next()
 })

@@ -140,8 +140,8 @@
       padding-top: 30px;
       margin-bottom: -6px;
       a {
-        width: 280px;
-        height: 60px;
+        width: 244px;
+        height: 56px;
         display: block;
         background: url("img/login-logo.png");
         margin: 0 auto;
