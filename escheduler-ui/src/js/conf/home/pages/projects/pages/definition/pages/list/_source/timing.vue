@@ -172,7 +172,7 @@
         warningGroupId: {},
         spinnerLoading: false,
         scheduleTime: '',
-        crontab: '0 0 * * * ? *',
+        crontab: '* * * * * ? *',
         cronPopover: false,
         receivers: [],
         receiversCc: [],
