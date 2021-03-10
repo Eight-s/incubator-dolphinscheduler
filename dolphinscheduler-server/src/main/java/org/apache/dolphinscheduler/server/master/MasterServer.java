@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
@@ -30,21 +31,22 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
-
-import javax.annotation.PostConstruct;
-
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.WebApplicationType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
+import javax.annotation.PostConstruct;
 
-
-
+@SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
@@ -93,8 +95,22 @@ public class MasterServer {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
+        logger.info(String.join(" ", args));
         new SpringApplicationBuilder(MasterServer.class).run(args);
+
     }
+
+    @Bean
+    MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${master.application.name}") String applicationName){
+        logger.info("Master Server Name: {}", applicationName);
+        return registry -> registry.config().commonTags("application", applicationName);
+    }
+
+    @Bean
+    public TomcatServletWebServerFactory servletContainer(@Value("${master.server.port}") Integer port){
+        return new TomcatServletWebServerFactory(port) ;
+    }
+
 
     /**
      * run master server

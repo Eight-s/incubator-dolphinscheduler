@@ -16,25 +16,33 @@
  */
 package org.apache.dolphinscheduler.api;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @ServletComponentScan
 @ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
         excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
                 pattern = "org.apache.dolphinscheduler.server.*"))
-
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:application-api.properties")
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
     SpringApplication.run(ApiApplicationServer.class, args);
   }
 
+  @Bean
+  MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${spring.application.name}") String applicationName){
+    return registry -> registry.config().commonTags("application", applicationName);
+  }
 
 }

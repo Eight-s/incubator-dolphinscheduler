@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
@@ -33,8 +34,12 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.WebApplicationType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
@@ -43,6 +48,7 @@ import javax.annotation.PostConstruct;
 /**
  *  worker server
  */
+@SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {MasterServer.class})
 })
@@ -89,6 +95,17 @@ public class WorkerServer {
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
         new SpringApplicationBuilder(WorkerServer.class).run(args);
+    }
+
+    @Bean
+    MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${worker.application.name}") String applicationName){
+        logger.info("Worker-Server: {}", applicationName);
+        return registry -> registry.config().commonTags("application", applicationName);
+    }
+
+    @Bean
+    public TomcatServletWebServerFactory servletContainer(@Value("${worker.server.port}") Integer port){
+        return new TomcatServletWebServerFactory(port) ;
     }
 
 
