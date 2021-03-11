@@ -90,7 +90,7 @@
                 sessionStorage.setItem("sessionId", sessionId)
                 cookies.set('sessionId', sessionId,{ path: '/' })
               }
-              
+
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
@@ -163,11 +163,11 @@
       padding-top: 30px;
       margin-bottom: -6px;
       a {
-        width: 280px;
-        height: 60px;
+        width: 400px;
+        height: 100px;
         display: block;
         background: url("img/login-logo.svg") no-repeat 23px;
-        margin: 0 auto;
+        margin-left: 23%;
       }
     }
     .from-model {

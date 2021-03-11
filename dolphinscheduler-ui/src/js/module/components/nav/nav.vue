@@ -481,12 +481,12 @@
     }
     .logo-box {
       position: absolute;
-      left: 10px;
-      top: 8px;
+      left: 26px;
+      top: -15px;
       cursor: pointer;
       >a {
         width: 180px;
-        height: 46px;
+        height: 90px;
         display: block;
         background: url("./logo.svg") no-repeat;
       }
