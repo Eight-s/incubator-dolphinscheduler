@@ -96,14 +96,12 @@ public class MasterServer implements IStoppable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
-        logger.info(String.join(" ", args));
         new SpringApplicationBuilder(MasterServer.class).run(args);
 
     }
 
     @Bean
     MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${master.application.name}") String applicationName){
-        logger.info("Master Server Name: {}", applicationName);
         return registry -> registry.config().commonTags("application", applicationName);
     }
 

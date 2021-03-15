@@ -52,15 +52,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
 /**
- *  worker server
+ * worker server
  */
-@ComponentScan("org.apache.dolphinscheduler")
-public class WorkerServer implements IStoppable {
 @SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {MasterServer.class})
 })
-public class WorkerServer {
+public class WorkerServer implements IStoppable {
 
     /**
      * logger
@@ -105,14 +103,13 @@ public class WorkerServer {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${worker.application.name}") String applicationName){
-        logger.info("Worker-Server: {}", applicationName);
+    MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${worker.application.name}") String applicationName) {
         return registry -> registry.config().commonTags("application", applicationName);
     }
 
     @Bean
-    public TomcatServletWebServerFactory servletContainer(@Value("${worker.server.port}") Integer port){
-        return new TomcatServletWebServerFactory(port) ;
+    public TomcatServletWebServerFactory servletContainer(@Value("${worker.server.port}") Integer port) {
+        return new TomcatServletWebServerFactory(port);
     }
 
     /**
