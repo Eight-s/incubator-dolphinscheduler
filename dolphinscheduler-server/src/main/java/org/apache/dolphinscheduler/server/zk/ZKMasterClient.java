@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.zk;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -31,21 +29,24 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * zookeeper master client
@@ -72,8 +73,7 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private MasterRegistry masterRegistry;
 
-    public void start() {
-
+    public void start(MasterServer masterServer) {
         InterProcessMutex mutex = null;
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
@@ -81,8 +81,11 @@ public class ZKMasterClient extends AbstractZKClient {
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
 
-            //  Master registry
+            // master registry
             masterRegistry.registry();
+            masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
@@ -105,8 +108,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
     @Override
     public void close() {
-        super.close();
         masterRegistry.unRegistry();
+        super.close();
     }
 
     /**
@@ -173,9 +176,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);

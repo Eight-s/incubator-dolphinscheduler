@@ -14,10 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -31,6 +34,11 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +51,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import javax.annotation.PostConstruct;
-
 /**
  *  worker server
  */
+@ComponentScan("org.apache.dolphinscheduler")
+public class WorkerServer implements IStoppable {
 @SpringBootApplication
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {MasterServer.class})
@@ -60,25 +68,25 @@ public class WorkerServer {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     /**
-     *  netty remote server
+     * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     *  worker registry
+     * worker registry
      */
     @Autowired
     private WorkerRegistry workerRegistry;
 
     /**
-     *  worker config
+     * worker config
      */
     @Autowired
     private WorkerConfig workerConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -87,9 +95,8 @@ public class WorkerServer {
     private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
     /**
-     * worker server startup
+     * worker server startup, not use web service
      *
-     * worker server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -108,15 +115,12 @@ public class WorkerServer {
         return new TomcatServletWebServerFactory(port) ;
     }
 
-
     /**
      * worker server run
      */
     @PostConstruct
-    public void run(){
-        logger.info("start worker server...");
-
-        //init remoting server
+    public void run() {
+        // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -127,7 +131,15 @@ public class WorkerServer {
         this.nettyRemotingServer.start();
 
         // worker registry
-        this.workerRegistry.registry();
+        try {
+            this.workerRegistry.registry();
+            this.workerRegistry.getZookeeperRegistryCenter().setStoppable(this);
+            Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
+            this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER, Constants.DELETE_ZK_OP);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
 
         // retry report task status
         this.retryReportTaskStatusThread.start();
@@ -135,9 +147,8 @@ public class WorkerServer {
         /**
          * register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
                 close("shutdownHook");
             }
         }));
@@ -146,8 +157,8 @@ public class WorkerServer {
     public void close(String cause) {
 
         try {
-            //execute only once
-            if(Stopper.isStopped()){
+            // execute only once
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -157,19 +168,22 @@ public class WorkerServer {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quitely stop
+                // thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception", e);
             }
 
+            // close
             this.nettyRemotingServer.close();
             this.workerRegistry.unRegistry();
-
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
-            System.exit(-1);
         }
     }
 
+    @Override
+    public void stop(String cause) {
+        close(cause);
+    }
 }
