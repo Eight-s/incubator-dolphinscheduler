@@ -14,17 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# zookeeper cluster.  multiple are separated by commas.  eg. 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181
-zookeeper.quorum=localhost:2181
-
-# dolphinscheduler root directory
-#zookeeper.dolphinscheduler.root=/dolphinscheduler
-
-# dolphinscheduler failover directory
-#zookeeper.session.timeout=60000
-#zookeeper.connection.timeout=30000
-#zookeeper.retry.base.sleep=100
-#zookeeper.retry.max.sleep=30000
-#zookeeper.retry.maxtime=10
-#zookeeper.max.wait.time=10000
+{{- if .Values.common.sharedStoragePersistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-shared
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+  {{- range .Values.common.sharedStoragePersistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  storageClassName: {{ .Values.common.sharedStoragePersistence.storageClassName | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.common.sharedStoragePersistence.storage | quote }}
+{{- end }}

@@ -19,7 +19,7 @@
     <div class="text-1">
       <a href="javascript:"></a>
     </div>
-    <div class="from-model">
+    <div class="form-model">
       <div class="list">
         <label>{{$t('User Name')}}</label>
         <div>
@@ -32,7 +32,7 @@
                   @on-enterkey="_ok">
           </x-input>
         </div>
-        <p class="error" v-if="isUserPassword">
+        <p class="error" v-if="isUserName">
           {{userNameText}}
         </p>
       </div>
@@ -170,7 +170,7 @@
         margin-left: 23%;
       }
     }
-    .from-model {
+    .form-model {
       padding: 30px 20px;
       .list {
         margin-bottom: 24px;
