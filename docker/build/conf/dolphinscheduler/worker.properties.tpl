@@ -15,20 +15,20 @@
 # limitations under the License.
 #
 
-# worker execute thread num
+# worker listener port
+#worker.listen.port=1234
+
+# worker execute thread number to limit task instances
 worker.exec.threads=${WORKER_EXEC_THREADS}
 
-# worker heartbeat interval
+# worker heartbeat interval, the unit is second
 worker.heartbeat.interval=${WORKER_HEARTBEAT_INTERVAL}
 
-# only less than cpu avg load, worker server can work. default value -1: the number of cpu cores * 2
+# worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
 worker.max.cpuload.avg=${WORKER_MAX_CPULOAD_AVG}
 
-# only larger than reserved memory, worker server can work. default value : physical memory * 1/6, unit is G.
+# worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
 worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 
-# worker listener port
-worker.listen.port=${WORKER_LISTEN_PORT}
-
-# default worker groups, if this worker belongs different groups, you can config the following like that 'worker.groups=default,test'
+# default worker groups separated by comma, like 'worker.groups=default,test'
 worker.groups=${WORKER_GROUPS}

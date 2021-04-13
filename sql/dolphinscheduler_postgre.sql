@@ -569,7 +569,8 @@ CREATE TABLE t_ds_task_instance (
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   executor_id int DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
 
 --
@@ -647,11 +648,12 @@ create index version_index on t_ds_version(version);
 DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
-  name varchar(256) DEFAULT NULL ,
-  ip_list varchar(256) DEFAULT NULL ,
+  name varchar(256) NOT NULL ,
+  addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
 --
