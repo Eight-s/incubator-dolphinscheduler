@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.server.master.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 import org.quartz.SchedulerException;
@@ -132,7 +132,8 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start(this);
+        this.zkMasterClient.start();
+        this.zkMasterClient.setStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();

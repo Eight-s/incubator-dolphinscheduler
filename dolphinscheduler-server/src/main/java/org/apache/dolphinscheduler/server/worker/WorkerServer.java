@@ -57,9 +57,7 @@ import java.util.Set;
         @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
                 "org.apache.dolphinscheduler.server.master.*",
                 "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*",
-                "org.apache.dolphinscheduler.server.zk.ZKMasterClient",
-                "org.apache.dolphinscheduler.server.registry.ServerNodeManager"
+                "org.apache.dolphinscheduler.server.log.*"
         })
 })
 @EnableTransactionManagement
