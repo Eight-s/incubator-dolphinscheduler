@@ -109,12 +109,12 @@ public class MasterServer implements IStoppable {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> masterConfigurer(@Value("${master.application.name}") String applicationName){
-        return registry -> registry.config().commonTags("application", applicationName);
+    MeterRegistryCustomizer<MeterRegistry> masterConfigurer(){
+        return registry -> registry.config().commonTags("application", "ds-master");
     }
 
     @Bean
-    public TomcatServletWebServerFactory servletContainer(@Value("${master.server.port}") Integer port){
+    public TomcatServletWebServerFactory servletContainer(){
         return new TomcatServletWebServerFactory(12340) ;
     }
 

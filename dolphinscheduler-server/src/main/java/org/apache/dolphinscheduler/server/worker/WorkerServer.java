@@ -108,12 +108,12 @@ public class WorkerServer implements IStoppable {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> workerConfigurer(@Value("${worker.application.name}") String applicationName) {
-        return registry -> registry.config().commonTags("application", applicationName);
+    MeterRegistryCustomizer<MeterRegistry> workerConfigurer() {
+        return registry -> registry.config().commonTags("application", "ds-worker");
     }
 
     @Bean
-    public TomcatServletWebServerFactory servletContainer(@Value("${worker.server.port}") Integer port) {
+    public TomcatServletWebServerFactory servletContainer() {
         return new TomcatServletWebServerFactory(12341);
     }
 
