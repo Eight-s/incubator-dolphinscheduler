@@ -65,12 +65,12 @@ if [ "$command" = "api-server" ]; then
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/master.properties -Dserver.port=5679"
+  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/master.properties -Dserver.port=12340 -Dspring.application.name=ds-master"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
   HEAP_OPTS="-Xms4g -Xmx4g -Xmn2g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $MASTER_SERVER_OPTS"
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/worker.properties -Dserver.port=1234"
+  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/worker.properties -Dserver.port=12341 -Dspring.application.name=ds-worker"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
   HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
