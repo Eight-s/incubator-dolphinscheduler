@@ -44,6 +44,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.PostConstruct;
@@ -61,6 +62,7 @@ import java.util.Set;
         })
 })
 @EnableTransactionManagement
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:worker.properties")
 public class WorkerServer implements IStoppable {
 
     /**
@@ -106,13 +108,13 @@ public class WorkerServer implements IStoppable {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${worker.application.name}") String applicationName) {
+    MeterRegistryCustomizer<MeterRegistry> workerConfigurer(@Value("${worker.application.name}") String applicationName) {
         return registry -> registry.config().commonTags("application", applicationName);
     }
 
     @Bean
     public TomcatServletWebServerFactory servletContainer(@Value("${worker.server.port}") Integer port) {
-        return new TomcatServletWebServerFactory(port);
+        return new TomcatServletWebServerFactory(12341);
     }
 
     /**

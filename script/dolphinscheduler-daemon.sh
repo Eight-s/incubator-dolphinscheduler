@@ -65,17 +65,17 @@ if [ "$command" = "api-server" ]; then
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/master.properties -Dserver.port=5679"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
   HEAP_OPTS="-Xms4g -Xmx4g -Xmn2g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $MASTER_SERVER_OPTS"
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/worker.properties -Dserver.port=1234"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
   HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
+  LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml -Dspring.config.localtion=${DOLPHINSCHEDULER_CONF_DIR}/alert.properties"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $ALERT_SERVER_OPTS"
