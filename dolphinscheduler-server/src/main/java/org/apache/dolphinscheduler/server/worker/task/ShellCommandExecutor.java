@@ -16,17 +16,22 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -46,14 +51,15 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * constructor
-     * @param logHandler logHandler
+     *
+     * @param logHandler           logHandler
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
+     * @param logger               logger
      */
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
                                 TaskExecutionContext taskExecutionContext,
                                 Logger logger) {
-        super(logHandler,taskExecutionContext,logger);
+        super(logHandler, taskExecutionContext, logger);
     }
 
 
@@ -68,6 +74,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * get command type
+     *
      * @return command type
      */
     @Override
@@ -78,9 +85,10 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * create command file if not exists
-     * @param execCommand   exec command
-     * @param commandFile   command file
-     * @throws IOException  io exception
+     *
+     * @param execCommand exec command
+     * @param commandFile command file
+     * @throws IOException io exception
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
@@ -110,8 +118,20 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append(execCommand);
             logger.info("command : {}", sb.toString());
 
+            //set rwxr-xr-x to command file
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
+            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+            Path commandPath = new File(commandFile).toPath();
+
+            if (OSUtils.isWindows()) {
+                Files.createFile(commandPath);
+            } else {
+                Files.createFile(commandPath, attr);
+            }
+
             // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+            Files.write(commandPath, sb.toString().getBytes(), StandardOpenOption.APPEND);
         }
     }
 
